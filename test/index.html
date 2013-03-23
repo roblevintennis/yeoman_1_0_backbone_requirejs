@@ -1,0 +1,29 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Mocha Spec Runner</title>
+  <link rel="stylesheet" href="lib/mocha/mocha.css">
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="lib/mocha/mocha.js"></script>
+  <script src="lib/chai.js"></script>
+  <!-- Requires symbolic link from app/script -> test/script since connect.test gets mounted on /test
+    in tests/ did:
+    $ ln -s ../app/scripts .
+    Also, require.js is not in app/scripts/vendor so in app/scripts/vendor I did:
+    $ ln -s ../../../node_modules/grunt-requirejs/node_modules/requirejs/require.js .
+    Also set mocha.all.options.run to false in Gruntfile.js
+  -->
+  <script data-main="scripts/main" src="scripts/vendor/require.js"></script>
+  <script>
+      mocha.setup({ui: 'bdd', ignoreLeaks: true});
+      expect = chai.expect;
+      require(['../spec/BackbonePlay.spec', '../spec/MyLib.spec'], function (BBSpec, MyLibSpec) {
+          require(['../runner/mocha']);
+      });
+
+  </script>
+</body>
+</html>
