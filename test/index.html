@@ -11,17 +11,23 @@
   <script src="lib/chai.js"></script>
   <!-- Requires symbolic link from app/script -> test/script since connect.test gets mounted on /test
     in tests/ did:
-    $ ln -s ../app/scripts .
+    $ ln -s ../app .
     Also, require.js is not in app/scripts/vendor so in app/scripts/vendor I did:
     $ ln -s ../../../node_modules/grunt-requirejs/node_modules/requirejs/require.js .
     Also set mocha.all.options.run to false in Gruntfile.js
   -->
-  <script data-main="scripts/main" src="scripts/vendor/require.js"></script>
+  <script data-main="app/scripts/main" src="app/scripts/vendor/require.js"></script>
   <script>
       mocha.setup({ui: 'bdd', ignoreLeaks: true});
       expect = chai.expect;
-      require(['../spec/BackbonePlay.spec', '../spec/MyLib.spec'], function (BBSpec, MyLibSpec) {
-          require(['../runner/mocha']);
+
+      // Assumes we've symlinked <root>/app to <root>/test/app
+      var up = '../../';//up 2 from app/scripts ;-)
+      var specs = up+'spec/';
+
+      require([
+          specs+'MyLib.spec', specs+'App.spec'], function (libspec, appspec) {
+          require([up+'runner/mocha']);
       });
 
   </script>

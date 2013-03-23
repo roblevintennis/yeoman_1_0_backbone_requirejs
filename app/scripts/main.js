@@ -22,11 +22,11 @@ require(['App', 'jquery', 'underscore', 'backbone', 'backboneLocalStorage', 'sin
     function (App, $, _, Backbone, backboneLocalStorage, sinon, sinonChai, MyLib) {
     'use strict';
     // use app here
-    debugger;
+//    debugger;
 //    console.log(App);
 //    console.log(Backbone);
 //    console.log(MyLib);
 //    console.log(_);
 //    console.log(backboneLocalStorage);
-    console.log('Running jQuery %s', $().jquery);
+//    console.log('Running jQuery %s', $().jquery);
 });
