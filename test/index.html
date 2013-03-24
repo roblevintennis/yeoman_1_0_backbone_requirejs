@@ -21,15 +21,13 @@
       mocha.setup({ui: 'bdd', ignoreLeaks: true});
       expect = chai.expect;
 
-      // Assumes we've symlinked <root>/app to <root>/test/app
-      var up = '../../';//up 2 from app/scripts ;-)
-      var specs = up+'spec/';
+      var upDirs = '../../';
+      var specs = upDirs + 'specs/';
 
-      require([
-          specs+'MyLib.spec', specs+'App.spec'], function (libspec, appspec) {
-          require([up+'runner/mocha']);
-      });
-
+      require([specs + 'App.spec'], function(appSpec) {
+          // Below in turn calls our mocha.run()
+          require([upDirs + 'runner/mocha']);
+      })
   </script>
 </body>
 </html>
