@@ -1,36 +1,36 @@
 define(['jquery', 'underscore', 'backbone', 'App'], function($, _, Backbone, App) {
 
-    describe('Backbone Models', function() {
+    describe("Backbone Model Tests", function() {
 
-        it('should be able to work with Backbone Models', function() {
-            var Model = Backbone.Model.extend({});
-            var model = new Model({first_name: 'Rob', last_name: 'Levin'});
-            expect(model instanceof Backbone.Model).to.equal(true);
-            expect(model.get('first_name')).to.equal('Rob');
+        it("just learning me some Backbone", function() {
+            var firstNameValidationError = 'First name must contain only alpha characters.';
+            var Model = Backbone.Model.extend({
+                validate: function(attrs, options) {
+                    if (attrs.first_name) {
+                        if (! /^(?:[A-Za-z]+)$/.test(attrs.first_name)) {
+                            return firstNameValidationError;
+                        }
+                    }
+                }
+            });
+            var instance = new Model({
+                first_name: 'Rob'
+            });
+            instance.on('invalid', function(model, error) {
+                expect(error).to.equal(firstNameValidationError);
+            });
+            instance.set('first_name', '1234Robin');
+            instance.save();
         });
 
-        it('should be able to get a backbone model from our app', function() {
+        it('should return a backbone model from our application', function() {
             var contact = new App.Contact({
-                first_name: 'Johnny',
-                last_name: 'Mac'
+                first_name: 'Rob',
+                last_name: 'Levin'
             });
             expect(contact instanceof Backbone.Model).to.equal(true);
-            expect(contact.get('first_name')).to.equal('Johnny');
-            expect(contact.get('last_name')).to.equal('Mac');
+            expect(contact.get('first_name')).to.equal('Rob');
         });
 
-        it('should validate the backbone model from our app', function() {
-            var contact = new App.Contact({
-                first_name: '123_illegal_Johnny',
-                last_name: 'Mac'
-            });
-
-            contact.on("invalid", function(model, error) {
-                console.log(error);
-                expect(error.length > 0).to.equal(true);
-                expect(error.match(/.*alphabetical.*/g)).not.to.equal(false);
-            });
-            contact.save();
-        });
     });
 });
