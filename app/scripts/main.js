@@ -7,8 +7,8 @@ require.config({
         backbone: '../components/backbone-amd/backbone',
         backboneLocalStorage: '../components/backbone.localStorage/backbone.localStorage',
         bootstrap: 'vendor/bootstrap',
-        sinon: '../components/sinon/lib/sinon',
-        sinonChai: '../components/sinon-chai/lib/sinon-chai'
+        text: '../components/requirejs-text/text',
+        templates: '../templates'
     },
     shim: {
         bootstrap: {
@@ -18,15 +18,18 @@ require.config({
     }
 });
 
-require(['App', 'jquery', 'underscore', 'backbone', 'backboneLocalStorage', 'sinon', 'sinonChai', 'MyLib', 'bootstrap'],
-    function (App, $, _, Backbone, backboneLocalStorage, sinon, sinonChai, MyLib) {
-    'use strict';
-    // use app here
-//    debugger;
-//    console.log(App);
-//    console.log(Backbone);
-//    console.log(MyLib);
-//    console.log(_);
-//    console.log(backboneLocalStorage);
-//    console.log('Running jQuery %s', $().jquery);
+require([
+    'App',
+    'views/app'
+],
+function(App, AppView) {
+    window._mainApp = new App(AppView);
+    window._mainApp.start();
 });
+
+/*
+require(['App', 'jquery', 'underscore', 'backbone', 'backboneLocalStorage', 'bootstrap'],
+    function (App, $, _, Backbone, backboneLocalStorage, sinon, sinonChai) {
+    'use strict';
+});
+*/
