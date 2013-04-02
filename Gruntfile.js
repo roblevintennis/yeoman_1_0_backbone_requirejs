@@ -259,6 +259,13 @@ module.exports = function (grunt) {
         'mocha'
     ]);
 
+    grunt.registerTask('testb', [
+        'clean:server',
+        'compass',
+        'connect:test',
+        'open',
+        'mocha'
+    ]);
     grunt.registerTask('build', [
         'clean:dist',
         'jshint',

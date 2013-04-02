@@ -20,16 +20,35 @@ require.config({
 
 require([
     'App',
-    'views/app'
+    'collections/tasks',
+    'collections/categories',
+    'models/task',
+    'models/category',
+    'views/app',
+    'views/nav',
+    'views/sidebar',
+    'views/content'
 ],
-function(App, AppView) {
-    window._mainApp = new App(AppView);
+function(
+    App,
+    Tasks,
+    Categories,
+    Task,
+    Category,
+    AppView,
+    NavBarView,
+    SidebarView,
+    ContentView
+) {
+    window._mainApp = new App(
+        Tasks,
+        Categories,
+        Task,
+        Category,
+        AppView,
+        NavBarView,
+        SidebarView,
+        ContentView
+    );
     window._mainApp.start();
 });
-
-/*
-require(['App', 'jquery', 'underscore', 'backbone', 'backboneLocalStorage', 'bootstrap'],
-    function (App, $, _, Backbone, backboneLocalStorage, sinon, sinonChai) {
-    'use strict';
-});
-*/
