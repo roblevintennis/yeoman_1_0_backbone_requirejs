@@ -42,8 +42,7 @@ function(
         myapp = null;
         sandbox.restore();
     });
-
-    it('should bootstrap app, take AppView, NavBarView, Sidebar, Content, view dependencies', function() {
+    it('should bootstrap app taking View dependencies', function() {
         expect(myapp.Views.appView instanceof AppView).to.equal(true);
         expect(myapp.Views.navView instanceof NavBarView).to.equal(true);
         expect(myapp.Views.sidebarView instanceof SidebarView).to.equal(true);
@@ -52,6 +51,11 @@ function(
         expect(_.isFunction(myapp.Views.navView.render)).to.equal(true);
         expect(_.isFunction(myapp.Views.sidebarView.render)).to.equal(true);
         expect(_.isFunction(myapp.Views.contentView.render)).to.equal(true);
+    });
+    it('should bootstrap app taking Model and Collection dependencies', function() {
+        expect(typeof myapp.Models.Task !== undefined).to.equal(true);
+        expect(typeof myapp.Models.Category !== undefined).to.equal(true);
+        expect(typeof myapp.Collections.Categories !== undefined).to.equal(true);
     });
     it('should render main app and subviews when start called', function() {
         var sidebarSpy = sandbox.spy(myapp.Views.sidebarView, 'render');
@@ -67,8 +71,8 @@ function(
         ]);
         expect(allCategories.models.length === 2).to.equal(true);
         allCategories.each(function(c) {
+            expect(c.url()).to.equal('/category/' + c.get('id'));
             expect(c.get('title').length > 0).to.equal(true);
-            expect(c.url().indexOf(c.get('id') >= 0).to.equal(true);
         });
     });
     it('should have Task, Tasks, and Categories with correct URL', function() {
