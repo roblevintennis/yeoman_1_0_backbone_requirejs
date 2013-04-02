@@ -3,5 +3,6 @@ temp
 dist
 .sass-cache
 app/components
+sandbox.html
 .tmp
 .idea

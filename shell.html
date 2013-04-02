@@ -1,0 +1,91 @@
+<!doctype html>
+<head>
+    <title>Backbone Sandbox</title>
+</head>
+<body>
+<h1>Let the fun begin!</h1>
+<div id="app" class="container-fluid"></div>
+<script src="app/components/requirejs/require.js"></script>
+<script type="text/javascript">
+    require.config({
+        paths: {
+            jquery: 'app/components/jquery/jquery',
+            underscore: 'app/components/underscore-amd/underscore',
+            backbone: 'app/components/backbone-amd/backbone',
+            backboneLocalStorage: 'app/components/backbone.localStorage/backbone.localStorage'
+        },
+        shim: {
+            bootstrap: {
+                deps: ['jquery'],
+                exports: 'jquery'
+            }
+        }
+    });
+    require(['jquery', 'underscore', 'backbone'],
+    function($, _, Backbone) {
+        var Book = Backbone.Model.extend({});
+        var Books = Backbone.Collection.extend({
+            model: Book
+        });
+        var Library = Backbone.Model.extend({
+            initialize: function(options) {
+                var self = this;
+                this.books = options.books ? options.books : [];
+                this.books.url = function() {
+                    return self.url() + '/books';
+                };
+                urlRoot: '/library/'
+            }
+        });
+        var books = new Books([
+            {
+                id: 1,
+                title: "The Lord of the Rings",
+                author: "J. R. R. Tolkien",
+                categories: ['fiction', 'adventure']
+            },
+            {
+                id: 2,
+                title: "The Hobbit",
+                author: "J. R. R. Tolkien",
+                categories: ['fiction', 'adventure']
+            },
+            {
+                id: 3,
+                title: "The Lion, the Witch, and the Wardrobe",
+                author: "C. S. Lewis",
+                categories: ['fiction', 'adventure']
+            },
+            {
+                id: 4,
+                title: "The 7 Habits of Highly Effective People",
+                author: "Stephen R. Covey",
+                categories: ['self-help']
+            },
+            {
+                id: 5,
+                title: "Who Moved My Cheese?",
+                author: "Spencer Johnson",
+                categories: ['self-help']
+            }
+        ]);
+        var library = new Library({books: books, title: "Little Town's Library"});
+        console.log("Library: ");
+        console.log(library.get('title'));
+        console.log('');
+        library.get('books').each(function(b) {
+            console.log(b.get('title'));
+            console.log(b.get('author'));
+            console.log("Categories: ");
+            _.each(b.get('categories'), function(c) {
+                console.log('          '+c);
+            });
+            console.log('');
+        });
+    });
+
+</script>
+</body>
+</html>
+</body>
+</html>
