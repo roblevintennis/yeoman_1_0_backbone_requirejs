@@ -49,5 +49,6 @@ function(
         SidebarView,
         ContentView
     );
+    window._mainApp.seedDemoData();
     window._mainApp.start();
 });

@@ -71,7 +71,7 @@ function(
         ]);
         expect(allCategories.models.length === 2).to.equal(true);
         allCategories.each(function(c) {
-            expect(c.url()).to.equal('/category/' + c.get('id'));
+            expect(c.url()).to.equal('/categories/' + c.get('id'));
             expect(c.get('title').length > 0).to.equal(true);
         });
     });
@@ -90,9 +90,9 @@ function(
         t2 = personalTasks.tasks.models[1]
         expect(t1.get('id')).to.equal(1);
         expect(t1.get('title')).to.equal('Buy groceries');
-        expect(t1.url()).to.equal('/category/1234/tasks/1');
+        expect(t1.url()).to.equal('/categories/1234/tasks/1');
         expect(t2.get('id')).to.equal(2);
         expect(t2.get('title')).to.equal('Watch movies');
-        expect(t2.url()).to.equal('/category/1234/tasks/2');
+        expect(t2.url()).to.equal('/categories/1234/tasks/2');
     });
 });

@@ -12,7 +12,7 @@ function(Backbone, Tasks) {
                 return self.url() + '/tasks';
             };
         },
-        urlRoot: '/category/'
+        urlRoot: '/categories/'
     });
     return TaskCategory;
 });
