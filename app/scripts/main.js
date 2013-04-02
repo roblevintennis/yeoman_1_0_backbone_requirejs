@@ -1,7 +1,6 @@
 require.config({
     paths: {
         App: 'app',
-        MyLib: 'MyLib',
         jquery: '../components/jquery/jquery',
         underscore: '../components/underscore-amd/underscore',
         backbone: '../components/backbone-amd/backbone',
