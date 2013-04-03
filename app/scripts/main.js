@@ -11,13 +11,14 @@ require.config({
     },
     shim: {
         bootstrap: {
-            deps: ['jquery'],
+            deps: ['jquery', 'underscore'],
             exports: 'jquery'
         }
     }
 });
 
 require([
+    'backbone',
     'App',
     'collections/tasks',
     'collections/categories',
@@ -26,9 +27,11 @@ require([
     'views/app',
     'views/nav',
     'views/sidebar',
-    'views/content'
+    'views/content',
+    'routers/router'
 ],
 function(
+    Backbone,
     App,
     Tasks,
     Categories,
@@ -37,9 +40,11 @@ function(
     AppView,
     NavBarView,
     SidebarView,
-    ContentView
+    ContentView,
+    AppRouter
 ) {
-    window._mainApp = new App(
+
+    window._app = new App(
         Tasks,
         Categories,
         Task,
@@ -47,8 +52,10 @@ function(
         AppView,
         NavBarView,
         SidebarView,
-        ContentView
+        ContentView,
+        AppRouter
     );
-    window._mainApp.seedDemoData();
-    window._mainApp.start();
+
+    window._app.seedDemoData();
+    window._app.start();
 });

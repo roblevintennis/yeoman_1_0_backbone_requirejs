@@ -1,9 +1,9 @@
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
             <li class="nav-header">Categories</li>
-            <li><a href="#" class="active">All</a></li>
-            <% if (this.categories.length) { %>
-                <% this.categories.each(function(category) { console.log(category) %>
+            <li class="active"><a href="#">All</a></li>
+            <% if (this.collection.length) { %>
+                <% this.collection.each(function(category) { %>
                     <li>
                         <a href=<%= '"#categories/'+category.id+'"' %>><%= category.get('title') %></a>
                     </li>

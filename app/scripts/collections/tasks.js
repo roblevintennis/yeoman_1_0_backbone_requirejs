@@ -1,10 +1,12 @@
 define([
     'backbone',
-    'models/task'
+    'models/task',
+    'backboneLocalStorage'
 ],
-function(Backbone, Task) {
+function(Backbone, Task, Store) {
     var Tasks = Backbone.Collection.extend({
-        model:Task
+        model:Task,
+        localStorage: new Store('task-manager')
     });
     return Tasks;
 });

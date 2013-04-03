@@ -1,10 +1,12 @@
 define([
     'backbone',
-    'models/category'
+    'models/category',
+    'backboneLocalStorage'
 ],
-function(Backbone, Category) {
+function(Backbone, Category, Store) {
     var Categories = Backbone.Collection.extend({
-        model: Category
+        model: Category,
+        localStorage: new Store('task-manager')
     });
     return Categories;
 });

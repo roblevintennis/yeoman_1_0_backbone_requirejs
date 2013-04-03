@@ -10,7 +10,8 @@ define([
     'views/app',
     'views/nav',
     'views/sidebar',
-    'views/content'
+    'views/content',
+    'routers/router'
 ],
 function(
     $,
@@ -24,10 +25,14 @@ function(
     AppView,
     NavBarView,
     SidebarView,
-    ContentView
+    ContentView,
+    AppRouter
 ) {
     var myapp, sandbox;
     beforeEach(function() {
+        // Hack ensures no: "Backbone.history has already been started" error
+        Backbone.history.stop();
+
         myapp = new App(Tasks,
                         Categories,
                         Task,
@@ -35,7 +40,8 @@ function(
                         AppView,
                         NavBarView,
                         SidebarView,
-                        ContentView);
+                        ContentView,
+                        AppRouter);
         sandbox = sinon.sandbox.create();
     });
     afterEach(function() {
