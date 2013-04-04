@@ -25,7 +25,16 @@
       var upDirs = '../../';
       var specs = upDirs + 'specs/';
 
-      require([specs + 'App.spec'], function(appSpec) {
+      require([
+              specs + 'App.spec',
+              specs +'Sidebar.spec',
+              specs +'Content.spec'
+              ],
+              function(
+                appSpec,
+                sidebarSpec,
+                contentSpec) {
+
           // below contains mocha.run()
           require([upDirs + 'runner/mocha']);
       })
