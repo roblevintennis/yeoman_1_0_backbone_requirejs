@@ -1,7 +1,9 @@
 define([
-    'backbone'
+    'backbone',
+    'backboneLocalStorage'
 ],
-function(Backbone) {
-    var Task = Backbone.Model.extend({});
+function(Backbone, Store) {
+    var Task = Backbone.Model.extend({
+    });
     return Task;
 });

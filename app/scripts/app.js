@@ -33,61 +33,45 @@ define([], function() {
             this.Views.navView.render();
             var mainView = this.Views.appView.render();
             this.Views.sidebarView.render(mainView.$el.find('.left'), this);
-
             this.Views.contentView.render(mainView.$el.find('.right'), this);
             Backbone.history.start();
         },
         // TODO: We'll get rid of this or move later ... just "spiking" ;)
         seedDemoData: function() {
-            var me = new this.Collections.Tasks([
-                {
-                    id: 1,
+            var categories = this.Collections.categories;
+            categories.fetch();
+            if (!categories.length) {
+                var myTask = new this.Models.Task({
                     title: "Build Backbone Application",
-                    categories: ['screencasts']
-                },
-                {
-                    id: 2,
+                    categories: ['Mine', 'Screencasts']
+                });
+                var myTask2 = new this.Models.Task({
                     title: "Read Secrets of the JavaScript Ninja",
-                    categories: ['reading']
-                }
-            ]);
-            var work = new this.Collections.Tasks([
-                {
-                    id: 11,
+                    categories: ['Mine', 'Reading']
+                });
+                var workTask1 = new this.Models.Task({
                     title: "Complete docs",
                     categories: ['Work']
-                },
-                {
-                    id: 12,
+                });
+                var workTask2 = new this.Models.Task({
                     title: "Submit timesheets",
                     categories: ['Work']
-                }
-            ]);
-            var family = new this.Collections.Tasks([
-                {
-                    id: 21,
+                });
+                var familyTask1 = new this.Models.Task({
                     title: "Lunch with fambam",
                     categories: ['Family']
-                },
-                {
-                    id: 22,
+                });
+                var familyTask2 = new this.Models.Task({
                     title: "Plan Party",
                     categories: ['Family']
-                }
-            ]);
-            var my = new this.Models.Category({id: 1, title: 'Mine', tasks: me});
-            var job = new this.Models.Category({id: 2, title: 'Work', tasks: work});
-            var fam = new this.Models.Category({id: 3, title: 'Family', tasks: family});
-            this.Collections.categories.reset([my, job, fam]);
-            console.log("***** Demo Categories Created *****");
-            /*
-            this.Collections.categories.each(function(c) {
-                console.log('Category: ', c.get('title'));
-                c.get('tasks').models.forEach(function(t) {
-                    console.log('Task: ', t.get('title'));
                 });
-            });
-            */
+                categories.create({title: 'Mine', tasks: [myTask, myTask2] });
+                categories.create({title: 'Family', tasks: [familyTask1, familyTask2] });
+                categories.create({title: 'Work', tasks: [workTask1, workTask2] });
+                console.log("***** Demo Categories Created *****");
+            } else {
+                console.log("***** Categories in localStorage found (length: " + categories.length + ") *****");
+            }
         }
     };
     return App;

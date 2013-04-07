@@ -1,0 +1,38 @@
+            <table class="table create-task">
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <td class="save-cancel"><button class="save btn btn-primary">Save</button><a href="#" class="cancel">Cancel<a/></td>
+                        <td><input type="text" placeholder="Add task"></td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn menu">Select a category</button>
+                                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    <% this.collection.each(function(category) { %>
+                                    <li><a tabindex="-1" href="#" data-id="<%= category.id %>"><%= category.get('title') %></a></li>
+                                    <% }); %>
+                                    <li class="divider"></li>
+                                    <li><a tabindex="-1" href="#newCategoryModal" class="create-category" data-toggle='modal' value="create-category">Create category</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Modal for creating a new category -->
+            <div id="newCategoryModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="createCategoryLbl" aria-hidden="true">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 id="createCategoryLbl">New Category</h3>
+                </div>
+                <div class="modal-body">
+                    <input class="new-cat span10" type="text" placeholder="New category">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                    <button class="btn btn-primary save">Save</button>
+                </div>
+            </div>

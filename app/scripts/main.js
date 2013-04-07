@@ -19,6 +19,7 @@ require.config({
 
 require([
     'backbone',
+    'bootstrap',
     'App',
     'collections/tasks',
     'collections/categories',
@@ -32,6 +33,7 @@ require([
 ],
 function(
     Backbone,
+    Bootsrap,
     App,
     Tasks,
     Categories,

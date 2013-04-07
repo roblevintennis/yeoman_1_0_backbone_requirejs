@@ -4,7 +4,7 @@
             <li class="active"><a href="#">All</a></li>
             <% if (this.collection.length) { %>
                 <% this.collection.each(function(category) { %>
-                    <li>
+                    <li data-category-id="<%= category.id %>">
                         <a href=<%= '"#categories/'+category.id+'"' %>><%= category.get('title') %></a>
                     </li>
                 <% }); %>
