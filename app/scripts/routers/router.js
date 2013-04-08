@@ -13,12 +13,12 @@ define([
         },
         index: function () {
             if (_app) {
-                _app.Collections.categories.trigger('categories:route:changed');
+                _app.Collections.categories.trigger('categories:selected:changed');
             }
         },
         categories: function (param) {
             if (_app) {
-                _app.Collections.categories.trigger('categories:route:changed', param.trim() || '');
+                _app.Collections.categories.trigger('categories:selected:changed', param.trim() || '');
             }
         }
     });

@@ -12,8 +12,9 @@ function(Backbone, _, sidebarTpl) {
         // Keeps track of last selected category
         selectedCategory: null,
         initialize: function() {
-            this.listenTo(this.collection, 'categories:route:changed', this.selectCategory)
-            this.listenTo(this.collection, 'add', this.categoryAdded)
+            this.listenTo(this.collection, 'categories:selected:changed', this.selectCategory)
+            // Sync fired when they add a new category via 'Create category'
+            this.listenTo(this.collection, 'sync', this.updateSidebar);
         },
         /**
          * Renders the content view
@@ -28,8 +29,8 @@ function(Backbone, _, sidebarTpl) {
             this.delegateEvents();
             return this;
         },
-        categoryAdded: function(category) {
-            // if we've already initialized view
+        updateSidebar: function(collection) {
+            // Only re-render if we've already initialized view (seed data might trigger)
             if (this.$containerEl) this.render();
         },
         selectCategory: function(id) {

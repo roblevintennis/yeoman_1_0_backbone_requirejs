@@ -4,7 +4,8 @@ require.config({
         jquery: '../components/jquery/jquery',
         underscore: '../components/underscore-amd/underscore',
         backbone: '../components/backbone-amd/backbone',
-        backboneLocalStorage: '../components/backbone.localStorage/backbone.localStorage',
+        // Had issue getting correct one w/bower so suffix'ed with .custom and git clone https://github.com/jeromegn/Backbone.localStorage.git
+        backboneLocalStorage: '../components/backbone.localStorage.custom/backbone.localStorage',
         bootstrap: 'vendor/bootstrap',
         text: '../components/requirejs-text/text',
         templates: '../templates'

@@ -3,7 +3,7 @@
                 <tbody>
                     <tr>
                         <td class="save-cancel"><button class="save btn btn-primary">Save</button><a href="#" class="cancel">Cancel<a/></td>
-                        <td><input type="text" placeholder="Add task"></td>
+                        <td><input class="task-title" type="text" placeholder="Add task" value="<%= this.enteredTitle || '' %>"></td>
                         <td>
                             <div class="btn-group">
                                 <button class="btn menu">Select a category</button>
@@ -12,7 +12,7 @@
                                 </button>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                     <% this.collection.each(function(category) { %>
-                                    <li><a tabindex="-1" href="#" data-id="<%= category.id %>"><%= category.get('title') %></a></li>
+                                    <li><a tabindex="-1" href="#" data-id="<%= category.id %>"><%= category.get('title') || '' %></a></li>
                                     <% }); %>
                                     <li class="divider"></li>
                                     <li><a tabindex="-1" href="#newCategoryModal" class="create-category" data-toggle='modal' value="create-category">Create category</a></li>
