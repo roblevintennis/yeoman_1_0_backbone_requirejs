@@ -29,6 +29,26 @@ function(Backbone, Tasks, Task, Category, Store) {
                 this.reset(updateCategories);
             }
             return foundit;
+        },
+        removeTaskForCategory: function(categoryId, taskId) {
+            var removed = false;
+            var updateCategories = _.map(this.models, function(category) {
+                var tasks, removeTask;
+                if (category.id === categoryId) {
+                    tasks = category.get('tasks') || new Tasks();
+                    removeTask = tasks.get(taskId);
+                    if (removeTask) {
+                        tasks.remove(removeTask);
+                        category.save({tasks: tasks});
+                        removed = true;
+                    }
+                }
+                return category;
+            });
+            if (removed) {
+                this.reset(updateCategories);
+            }
+            return removed;
         }
     });
     return Categories;

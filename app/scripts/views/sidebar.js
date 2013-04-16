@@ -7,12 +7,14 @@ function(Backbone, _, sidebarTpl) {
     var SidebarView = Backbone.View.extend({
         template: _.template(sidebarTpl),
         events: {
-            "click .sidebar-nav li:not(.nav-header)": "onCategorySelected"
+            "click .sidebar-nav li:not(.nav-header)": "onCategorySelected",
+            "click .remove-category": "onDeleteCategory"
         },
         // Keeps track of last selected category
         selectedCategory: null,
         initialize: function() {
             this.listenTo(this.collection, 'categories:selected:changed', this.selectCategory)
+            this.listenTo(this.collection, 'select:category', this.selectCategory)
             // Sync fired when they add a new category via 'Create category'
             this.listenTo(this.collection, 'sync', this.updateSidebar);
         },
@@ -41,15 +43,24 @@ function(Backbone, _, sidebarTpl) {
             var self = this, id;
             id = id || '';
             this.lastSelectedCategoryId = id;
+            this.removeAllActive();
 
+            // If no id optimize to just select 'All'
+            if (!id) {
+                self.selectAllCategory();
+                return;
+            }
+            // Otherwise, look for category on sidebar with a matching id
             this.$('.nav-list>li').not('.nav-header').each(function(idx, categoryElement) {
-                // Find the matching category on the sidebar by id
                 var categoryId = self.$(categoryElement).data('category-id');
                 if (categoryId && categoryId === self.lastSelectedCategoryId) {
-                    self.removeAllActive();
                     self.highlightElement(categoryElement);
                 }
             });
+        },
+        selectAllCategory: function() {
+            var all = this.$('.nav-list>li').not('.nav-header').first();
+            this.highlightElement(all);
         },
         removeAllActive:  function() {
             this.$('.nav-list>li').removeClass('active');
@@ -61,6 +72,20 @@ function(Backbone, _, sidebarTpl) {
             this.removeAllActive();
             this.highlightElement(evt.currentTarget);
         },
+        onDeleteCategory: function(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            var categoryLI = this.$(evt.currentTarget).closest('li');
+            var categoryId = categoryLI.data('category-id');
+
+            if (categoryId) {
+                var category = this.collection.findWhere({id: categoryId});
+                if (category) {
+                    this.collection.trigger('category:delete', category);
+                }
+            }
+        }
+
     });
     return SidebarView;
 });

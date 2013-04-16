@@ -1,0 +1,11 @@
+        <!-- Categories dropdown -->
+        <ul class="categories dropdown-menu" role="menu" aria-labelledby="dLabel">
+            <% this.collection.each(function(category) { %>
+            <li><a tabindex="-1" href="#" data-id="<%= category.id %>"><%= category.get('title') || '' %></a></li>
+            <% }); %>
+            <% if (!this.collection.length) { %>
+                <li class="disabled"><a tabindex="-1" href="#">&#151;No categories yet&#151;</a></li>
+            <% } %>
+            <li class="divider"></li>
+            <li><a tabindex="-1" href="#newCategoryModal" class="create-category" data-toggle='modal' value="create-category">Create category</a></li>
+        </ul>

@@ -36,11 +36,14 @@ define([], function() {
             this.Views.contentView.render(mainView.$el.find('.right'), this);
             Backbone.history.start();
         },
-        // TODO: We'll get rid of this or move later ... just "spiking" ;)
-        seedDemoData: function() {
+        /**
+         * Seeds the app with local storage and/or demo data
+         * @param  {Boolean} seed Whether or not to seed with demo data (if no categories yet in local storage)
+         */
+        seed: function(seed) {
             var categories = this.Collections.categories;
             categories.fetch();
-            if (!categories.length) {
+            if (!categories.length && seed) {
                 var myTasks = new this.Collections.Tasks();
                 myTasks.create({title: "Build Backbone Application", categories: ['Mine', 'Screencasts']});
                 myTasks.create({title: "Read Secrets of the JavaScript Ninja", categories: ['Mine', 'Reading']} );

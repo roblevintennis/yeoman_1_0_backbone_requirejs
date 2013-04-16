@@ -58,7 +58,7 @@ function(
         ContentView,
         AppRouter
     );
-
-    window._app.seedDemoData();
+    // Do localStorage.clear() in console and pass in true to seed demo data
+    window._app.seed(false);
     window._app.start();
 });

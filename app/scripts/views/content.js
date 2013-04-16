@@ -4,7 +4,9 @@ define([
     'collections/tasks',
     'models/task',
     'text!templates/content.html',
-    'text!templates/create-task-partial.html'
+    'text!templates/create-task-partial.html',
+    'text!templates/categories-dropdown-partial.html',
+    'text!templates/delete-confirm-partial.html'
 ],
 function(
     Backbone,
@@ -12,20 +14,25 @@ function(
     Tasks,
     Task,
     contentTpl,
-    createTaskTpl
+    createTaskTpl,
+    categoriesDropdownTpl,
+    deleteConfirmPartial
 ){
     var ContentView = Backbone.View.extend({
         template: _.template(contentTpl),
         createTemplate: _.template(createTaskTpl),
+        categoriesDropdownTemplate: _.template(categoriesDropdownTpl),
+        deleteConfirmTemplate: _.template(deleteConfirmPartial),
         tasks: [],
         className: "content",
         events: {
             'click input[name=check]': 'onRecordChecked',
             'click .btn.create': 'onCreateTask',
-            'click .btn.delete': 'onDeleteTask',
+            'click .btn.delete': 'onDeleteTasks',
             'click .save-cancel a.cancel': 'onCancel',
-            'click .save-cancel button.save': 'onSave',
-            'click #newCategoryModal .btn.save': 'onSaveNewCategory'
+            'click .save-cancel button.save': 'onSaveTask',
+            'click #newCategoryModal .btn.save': 'onSaveNewCategory',
+            'keypress .task-title': 'onKeypress'
         },
         /**
          * Renders the content view
@@ -44,11 +51,22 @@ function(
         initialize: function() {
             _.bindAll(this);
             this.listenTo(this.collection, 'categories:selected:changed', this.filterByCategories);
-            this.listenTo(this.collection, 'sync', this.categoryAdded);
+            this.listenTo(this.collection, 'category:delete', this.confirmDelete);
+            this.listenTo(this.collection, 'destroy', this.onCategoryDeleted);
         },
-        onSave: function(evt) {
+        // When user clicks pencil to add a new task
+        onCreateTask: function(evt) {
+            evt.preventDefault();
+            var $pencil;
+            $pencil = this.$('.btn.create');
+            if (!$pencil.attr('disabled')) {
+                this.showCreateForm();
+            }
+        },
+        // When user saves a new task
+        onSaveTask: function(evt) {
             var title, categoriesTitleElement, category;
-            title = this.$('table.create-task .task-title').val();
+            title = this.$('table.create-task .task-title').val().trim();
             categoriesTitleElement = this.$('table.create-task').find('.btn.menu:first-child')
             var categoryId = categoriesTitleElement.data('id')
             var categoryTitle = categoriesTitleElement.text();
@@ -59,49 +77,88 @@ function(
                 this.reloadCategories(categoryId);
             }
         },
-        reloadCategories: function(categoryId) {
-            if (location.hash.indexOf(categoryId)  === -1) {
-                window._app.Routers.router.navigate('categories/' + categoryId, {trigger: true});
+        // When user hits <ENTER> when creating a new task
+        onKeypress: function(evt) {
+            if (evt.which === 13) {
+                this.onSaveTask(evt);
+            }
+        },
+        // When user clicks trash icon to with one or more tasks checked
+        onDeleteTasks: function(evt) {
+            evt.preventDefault();
+            var self = this,
+                categoryId = null;
+
+            // If trash icon is not disabled then one or more records are checked
+            $trash = this.$('.btn.delete');
+            if (!$trash.attr('disabled')) {
+                // Loop all records and remove each one that is checked
+                this.$('table.tasks input[name=check]').each(function(index, record) {
+                    if (record.checked) {
+                        var taskId = self.$(record).data('id');
+                        categoryId = self.$(record).data('category-id');
+                        self.collection.removeTaskForCategory(categoryId, taskId);
+                    }
+                });
+                this.collection.trigger('categories:selected:changed', this.lastCategoryId);
+            }
+        },
+        onRecordChecked: function(evt) {
+            if (this.$('input[name=check]:checked').length === 0) {
+                $('.delete').attr('disabled', 'disabled');
             } else {
-                this.filterByCategories(categoryId);
+                $('.delete').removeAttr('disabled', 'disabled');
             }
         },
         onCancel: function(evt) {
             this.clearCreateTaskForm();
             this.$('.btn.create').removeAttr('disabled');
         },
-        onDeleteTask: function(evt) {
-            evt.preventDefault();
-            $trash = this.$('.btn.delete');
-            if (!$trash.attr('disabled')) {
-                console.log("In trash enabled...");
-                this.$('table.tasks input[name=check]').each(function(index, record) {
-                    console.log("Index: ", index); console.log("record: ", record);
-                    if (record.checked) {
-                        alert("Is checked...");
-                    }
-                });
-            }
-        },
-        onCreateTask: function(evt) {
-            evt.preventDefault();
-            var $pencil;
-            $pencil = this.$('.btn.create');
-            if (!$pencil.attr('disabled')) {
-                this.showCreateForm();
-            }
-        },
-        clearCreateTaskForm: function() {
+        clearCreateTaskForm: function(saveState) {
             this.$('#newCategoryModal').remove();
             this.$('table.create-task').remove();
-            this.enteredTitle = '';
+            if (!saveState) {
+                this.enteredTitle = '';
+            }
         },
         onSaveNewCategory: function(evt) {
-            var newCategoryTitle = this.$('#newCategoryModal input.new-cat').val();
+            var categoryId, newCategory,
+                newCategoryTitle = this.$('#newCategoryModal input.new-cat').val();
             if (newCategoryTitle) {
-                // Add the new category (will persist to localStorage)
-                this.collection.create({title: newCategoryTitle});
+                newCategory = this.collection.create({title: newCategoryTitle});
+                this.categoryAdded();
             }
+            this.collection.trigger('select:category', this.lastCategoryId);
+        },
+        // Listener for category destroy event (user deletes entire category)
+        onCategoryDeleted:function(collection, options) {
+            this.collection.fetch();
+            this.setAllTasks();
+            this.render();
+        },
+        confirmDelete: function(categoryToDelete) {
+            // Insert the delete confirmation alert
+            var self = this, deleteConfirmationHtml, category;
+            category = categoryToDelete;
+            deleteConfirmationHtml = this.deleteConfirmTemplate();
+            $('.table-title').before(deleteConfirmationHtml);
+            // Listen for confirm / delete button clicks
+            this.$('.delete-confirmed').on('click', function(evt) {
+                evt.preventDefault();
+                // This w/trigger destroy event
+                category.destroy();
+                self.removeDeleteConfirmation();
+            });
+            this.$('.delete-cancelled').on('click', function(evt) {
+                evt.preventDefault();
+                self.removeDeleteConfirmation();
+            });
+        },
+        // Removes delete confirmation and it's event listeners
+        removeDeleteConfirmation: function() {
+            this.$('.delete-confirmed').off('click');
+            this.$('.delete-cancelled').off('click');
+            this.$('div.delete-confirm').remove();
         },
         categoryAdded: function() {
             var addedCategory, enteredTaskTitle, categoriesTitleElement;
@@ -109,8 +166,9 @@ function(
                 addedCategory = this.collection.at(this.collection.length-1);
                 enteredTaskTitle = this.$('table.create-task .task-title').val();
                 this.enteredTitle = enteredTaskTitle || '';
+                this.renderDropdown();
                 categoriesTitleElement = this.$('table.create-task').find('.btn.menu:first-child')
-                this._setCategoriesTitle(categoriesTitleElement, addedCategory.get('title'), addedCategory.id);
+                this.setCategoriesTitle(categoriesTitleElement, addedCategory.get('title'), addedCategory.id);
                 this.$('#newCategoryModal').modal('hide');
                 this.$('#newCategoryModal input.new-cat').val('');
                 this.$('table.create-task .task-title').focus();
@@ -121,36 +179,33 @@ function(
             // Here we're inserting create task just above the main tasks table.
             this.$('table.tasks').before(createTaskTpl);
             // Disable the pencil if we're already in create mode
+            this.renderDropdown();
             this.$('.btn.create').attr('disabled', 'disabled');
-            this._bindCategoryTitle();
         },
-        _setCategoriesTitle: function(categoriesTitleElement, title, id) {
+        renderDropdown: function() {
+            // Remove previous listener before removing dropdown
+            this.$(".dropdown-menu li a").off('click');
+            this.$('.categories.dropdown-menu').remove();
+            // Create new dropdown
+            var dropdown = this.categoriesDropdownTemplate();
+            this.$('table.create-task button.dropdown-toggle').after(dropdown);
+            this.bindCategoryTitle();
+        },
+        setCategoriesTitle: function(categoriesTitleElement, title, id) {
             categoriesTitleElement.text(title);
             categoriesTitleElement.attr('data-id', id);
         },
         // Displays whatever is selected in the category menu on top button
-        _bindCategoryTitle: function() {
+        bindCategoryTitle: function() {
             var self = this;
-            this.$(".dropdown-menu li a").click(function(evt) {
+            this.$(".dropdown-menu li a").on('click', function(evt) {
                 evt.preventDefault();
                 var id, title, categoriesTitleElement;
                 id = self.$(this).data('id');
                 title = self.$(this).text();
                 categoriesTitleElement = self.$(this).closest('div').find('.btn:first-child');
-                self._setCategoriesTitle(categoriesTitleElement, title, id);
+                self.setCategoriesTitle(categoriesTitleElement, title, id);
             });
-        },
-        /**
-         * Toggles the action buttons. For example, delete button should only
-         * be enabled if at least one checkbox is checked.
-         * @param  {Event} evt The DOM Event
-         */
-        onRecordChecked: function(evt) {
-            if (this.$('input[name=check]:checked').length === 0) {
-                $('.delete').attr('disabled', 'disabled');
-            } else {
-                $('.delete').removeAttr('disabled', 'disabled');
-            }
         },
         filterByCategories: function(categoryId) {
             var isCategory = this.setTasksForCategory(categoryId);
@@ -160,9 +215,12 @@ function(
         setTasksForCategory: function(id) {
             var tasks, category;
             category = _.find(this.collection.models, function(category) { return category.id === id; });
+            this.lastCategoryId = category ? id : '';//empty string will route to 'all'
             if (category) {
                 tasks = category.get('tasks');
                 this.tasks = tasks && tasks.models ? tasks.models : [];
+                // Add a reference back to each task's category id
+                this._addCategoryIDToTasks(category, this.tasks);
                 this.tableTitle = category.get('title');
                 return true;
             }
@@ -174,11 +232,27 @@ function(
             self.tasks = [];
             self.collection.each(function(category) {
                 // If this category has task models yet
-                if(category.get('tasks')) {
-                    self.tasks = self.tasks.concat(category.get('tasks').models);
+                var tasks = category.get('tasks');
+                tasks = tasks ? tasks.models : [];
+                if(tasks) {
+                    // Add a reference back to each task's category id
+                    self._addCategoryIDToTasks(category, tasks);
+                    self.tasks = self.tasks.concat(tasks);
                 }
             });
             self.tableTitle = 'All';
+        },
+        reloadCategories: function(categoryId) {
+            if (location.hash.indexOf(categoryId)  === -1) {
+                _app.Routers.router.navigate('categories/' + categoryId, {trigger: true});
+            } else {
+                this.filterByCategories(categoryId);
+            }
+        },
+        _addCategoryIDToTasks: function(category, tasks) {
+            _.each(tasks, function(task) {
+                task.set({categoryId: category.id});
+            });
         }
     });
     return ContentView;

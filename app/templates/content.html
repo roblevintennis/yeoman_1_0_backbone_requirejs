@@ -18,7 +18,7 @@
                     <% if (this.tasks && this.tasks.length) { %>
                         <% for(var i=0; i<this.tasks.length; i++) { %>
                             <tr>
-                                <td><input type="checkbox" name="check" data-id="<%= this.tasks[i].get('id') %>"></td>
+                                <td><input type="checkbox" name="check" data-category-id="<%= this.tasks[i].get('categoryId') %>" data-id="<%= this.tasks[i].get('id') %>"></td>
                                 <td class="span4"><%= this.tasks[i].get('title') %></td>
                                 <td class="span4">
                                 <% var categories = this.tasks[i].get('categories');

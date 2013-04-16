@@ -5,7 +5,9 @@
             <% if (this.collection.length) { %>
                 <% this.collection.each(function(category) { %>
                     <li data-category-id="<%= category.id %>">
-                        <a href=<%= '"#categories/'+category.id+'"' %>><%= category.get('title') %></a>
+                        <a class="category" href=<%= '"#categories/'+category.id+'"' %>><%= category.get('title') %>
+                            <i class="remove-category icon-remove"></i>
+                        </a>
                     </li>
                 <% }); %>
             <% } %>

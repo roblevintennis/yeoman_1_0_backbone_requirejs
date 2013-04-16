@@ -1,5 +1,18 @@
 @import 'sass-bootstrap/lib/bootstrap';
+.navbar .brand {
+    font-family: 'Satisfy', cursive;
+    color: rgb(34, 194, 216);
+}
+body {
+    background-image: url('../img/cloth_alike.png');
+}
 #app {
+
+    // Override to put our custom muted gray background
+    textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input,
+    .well, .custom-well, #newCategoryModal {
+        background-color: #f8f8f8;
+    }
     margin-top: 50px;
     .cat-create {
         margin-bottom: 20px;
@@ -11,7 +24,6 @@
         position: relative;
         margin: 0px;
         padding: 15px 20px 5px;
-        background-color: #fff;
         border: 1px solid #ddd;
         -webkit-border-radius: 4px;
         -moz-border-radius: 4px;
@@ -28,5 +40,37 @@
     }
     table.create-task {
         margin-bottom: 0px;
+    }
+    .nav-list li {
+        position: relative;
+        min-width: 75px;
+    }
+    .nav-list > .active > a,
+    .nav-list > .active > a:hover,
+    .nav-list > .active > a:focus,
+    a.category {
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        border-radius: 3px;
+    }
+    a.category:hover i.remove-category {
+        display:block;
+        text-shadow: 5px 5px 7px rgba(150, 150, 150, 0.4);
+    }
+    i.remove-category {
+        display: none;
+        position: absolute;
+        right: -12px;
+        top: 5px;
+    }
+    i.remove-category:hover {
+        display: block;
+        -webkit-transform: scale(1.2);
+        -moz-transform: scale(1.2);
+        -ms-transform: scale(1.2);
+        -o-transform: scale(1.2);
+        transform: scale(1.2);
     }
 }

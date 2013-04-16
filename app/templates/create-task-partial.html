@@ -10,13 +10,7 @@
                                 <button class="btn dropdown-toggle" data-toggle="dropdown">
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                                    <% this.collection.each(function(category) { %>
-                                    <li><a tabindex="-1" href="#" data-id="<%= category.id %>"><%= category.get('title') || '' %></a></li>
-                                    <% }); %>
-                                    <li class="divider"></li>
-                                    <li><a tabindex="-1" href="#newCategoryModal" class="create-category" data-toggle='modal' value="create-category">Create category</a></li>
-                                </ul>
+                                <!-- Dynamic: Categories dropdown -->
                             </div>
                         </td>
                     </tr>
