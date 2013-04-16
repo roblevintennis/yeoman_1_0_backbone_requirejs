@@ -53,46 +53,48 @@ function(
             var categoryId = categoriesTitleElement.data('id')
             var categoryTitle = categoriesTitleElement.text();
             if (categoryId) {
-                // TODO: Move this on to Categories addTaskToCategoryWithId(categoryId, taskTitle)
-                var updateCategories = _.map(this.collection.models, function(category) {
-                    if (category.id === categoryId) {
-                        // Update matching category
-                        var tasks = category.get('tasks') || new Tasks();
-                        var task = new Task({
-                            title: title,
-                            // TODO: We need to use ids instead here
-                            categories: [category.get('title')]
-                        });
-                        tasks.add(task);
-                        category.save({tasks: tasks});
-                    }
-                    // return updated category
-                    return category;
-                });
-                this.collection.reset(updateCategories);
+                this.collection.addTaskForCategory(categoryId, {title: title, categories: [categoryTitle]});
                 this.clearCreateTaskForm();
                 this.$('.btn.create').removeAttr('disabled');
-                this.collection.trigger('categories:selected:changed', categoryId);
+                this.reloadCategories(categoryId);
+            }
+        },
+        reloadCategories: function(categoryId) {
+            if (location.hash.indexOf(categoryId)  === -1) {
+                window._app.Routers.router.navigate('categories/' + categoryId, {trigger: true});
+            } else {
+                this.filterByCategories(categoryId);
             }
         },
         onCancel: function(evt) {
             this.clearCreateTaskForm();
             this.$('.btn.create').removeAttr('disabled');
         },
-        onDeleteTask: function() {
-            console.log("onDeleteTask called...");
+        onDeleteTask: function(evt) {
+            evt.preventDefault();
+            $trash = this.$('.btn.delete');
+            if (!$trash.attr('disabled')) {
+                console.log("In trash enabled...");
+                this.$('table.tasks input[name=check]').each(function(index, record) {
+                    console.log("Index: ", index); console.log("record: ", record);
+                    if (record.checked) {
+                        alert("Is checked...");
+                    }
+                });
+            }
         },
-        clearCreateTaskForm: function() {
-            this.$('#newCategoryModal').remove();
-            this.$('table.create-task').remove();
-            this.enteredTitle = '';
-        },
-        onCreateTask: function() {
+        onCreateTask: function(evt) {
+            evt.preventDefault();
             var $pencil;
             $pencil = this.$('.btn.create');
             if (!$pencil.attr('disabled')) {
                 this.showCreateForm();
             }
+        },
+        clearCreateTaskForm: function() {
+            this.$('#newCategoryModal').remove();
+            this.$('table.create-task').remove();
+            this.enteredTitle = '';
         },
         onSaveNewCategory: function(evt) {
             var newCategoryTitle = this.$('#newCategoryModal input.new-cat').val();
@@ -115,8 +117,6 @@ function(
             }
         },
         showCreateForm: function() {
-            this.$('#newCategoryModal').remove();
-            this.$('table.create-task').remove();
             var createTaskTpl = this.createTemplate();
             // Here we're inserting create task just above the main tasks table.
             this.$('table.tasks').before(createTaskTpl);
@@ -131,7 +131,8 @@ function(
         // Displays whatever is selected in the category menu on top button
         _bindCategoryTitle: function() {
             var self = this;
-            this.$(".dropdown-menu li a").click(function() {
+            this.$(".dropdown-menu li a").click(function(evt) {
+                evt.preventDefault();
                 var id, title, categoriesTitleElement;
                 id = self.$(this).data('id');
                 title = self.$(this).text();

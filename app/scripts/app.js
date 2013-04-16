@@ -41,33 +41,18 @@ define([], function() {
             var categories = this.Collections.categories;
             categories.fetch();
             if (!categories.length) {
-                var myTask = new this.Models.Task({
-                    title: "Build Backbone Application",
-                    categories: ['Mine', 'Screencasts']
-                });
-                var myTask2 = new this.Models.Task({
-                    title: "Read Secrets of the JavaScript Ninja",
-                    categories: ['Mine', 'Reading']
-                });
-                var workTask1 = new this.Models.Task({
-                    title: "Complete docs",
-                    categories: ['Work']
-                });
-                var workTask2 = new this.Models.Task({
-                    title: "Submit timesheets",
-                    categories: ['Work']
-                });
-                var familyTask1 = new this.Models.Task({
-                    title: "Lunch with fambam",
-                    categories: ['Family']
-                });
-                var familyTask2 = new this.Models.Task({
-                    title: "Plan Party",
-                    categories: ['Family']
-                });
-                categories.create({title: 'Mine', tasks: [myTask, myTask2] });
-                categories.create({title: 'Family', tasks: [familyTask1, familyTask2] });
-                categories.create({title: 'Work', tasks: [workTask1, workTask2] });
+                var myTasks = new this.Collections.Tasks();
+                myTasks.create({title: "Build Backbone Application", categories: ['Mine', 'Screencasts']});
+                myTasks.create({title: "Read Secrets of the JavaScript Ninja", categories: ['Mine', 'Reading']} );
+                var workTasks = new this.Collections.Tasks();
+                workTasks.create({title: "Complete docs", categories: ['Work']});
+                workTasks.create({title: "Submit timesheets", categories: ['Work']});
+                var familyTasks = new this.Collections.Tasks();
+                familyTasks.create({title: "Lunch with fambam", categories: ['Family']});
+                familyTasks.create({title: "Plan Party", categories: ['Family'] });
+                categories.create({title: 'Mine', tasks: myTasks});
+                categories.create({title: 'Family', tasks: familyTasks});
+                categories.create({title: 'Work', tasks: workTasks});
                 console.log("***** Demo Categories Created *****");
             } else {
                 console.log("***** Categories in localStorage found (length: " + categories.length + ") *****");
