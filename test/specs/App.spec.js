@@ -45,18 +45,18 @@ function(
                         AppRouter);
         var me = new myapp.Collections.Tasks([{
                 id: 1, title: "Build Backbone Application",
-                categories: ['screencasts']
+                category: 'Mine'
             },{
                 id: 2, title: "Read Secrets of the JavaScript Ninja",
-                categories: ['reading']
+                category: 'Mine'
             }]);
         var work = new myapp.Collections.Tasks([{
                 id: 11, title: "Complete docs",
-                categories: ['Work']
+                category: 'Work'
             }, {
                 id: 12,
                 title: "Submit timesheets",
-                categories: ['Work']
+                category: 'Work'
             }]);
         my = new myapp.Models.Category({id: 1, title: 'Mine', tasks: me});
         job = new myapp.Models.Category({id: 2, title: 'Work', tasks: work});

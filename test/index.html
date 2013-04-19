@@ -28,16 +28,18 @@
       require([
               specs + 'App.spec',
               specs +'Sidebar.spec',
-              specs +'Content.spec'
+              specs +'Content.spec',
+              specs +'Categories.spec'
               ],
               function(
                 appSpec,
                 sidebarSpec,
-                contentSpec) {
+                contentSpec,
+                categoriesSpec) {
 
           // below contains mocha.run()
           require([upDirs + 'runner/mocha']);
-      })
+      });
   </script>
 </body>
 </html>

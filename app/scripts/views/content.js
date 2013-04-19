@@ -27,6 +27,10 @@ function(
         className: "content",
         events: {
             'click input[name=check]': 'onRecordChecked',
+            'click .mark-completed': 'onTaskToggled',
+            'click .clear-completed': 'onClearCompleted',
+            'click .filter-completed': 'onFilterCompleted',
+            'click .filter-all': 'onFilterAll',
             'click .btn.create': 'onCreateTask',
             'click .btn.delete': 'onDeleteTasks',
             'click .save-cancel a.cancel': 'onCancel',
@@ -46,6 +50,7 @@ function(
             var rendered =  this.$el.html(this.template());
             this.$containerEl.html(rendered);
             this.delegateEvents();
+            this.toggleClearCompleted();
             return this;
         },
         initialize: function() {
@@ -71,7 +76,7 @@ function(
             var categoryId = categoriesTitleElement.data('id')
             var categoryTitle = categoriesTitleElement.text();
             if (categoryId) {
-                this.collection.addTaskForCategory(categoryId, {title: title, categories: [categoryTitle]});
+                this.collection.addTaskForCategory(categoryId, {title: title, category: categoryTitle});
                 this.clearCreateTaskForm();
                 this.$('.btn.create').removeAttr('disabled');
                 this.reloadCategories(categoryId);
@@ -102,6 +107,44 @@ function(
                 });
                 this.collection.trigger('categories:selected:changed', this.lastCategoryId);
             }
+        },
+        onFilterAll: function(evt) {
+            evt.preventDefault();
+            this.filterByCategories(this.lastCategoryId);
+        },
+        onFilterCompleted: function(evt) {
+            evt.preventDefault();
+            this.filterByCompleted(this.lastCategoryId);
+        },
+        onClearCompleted: function(evt) {
+            evt.preventDefault();
+            this.collection.pruneCompletedForCategory(this.lastCategoryId);
+            this.filterByCategories(this.lastCategoryId);
+            this.collection.trigger('select:category', this.lastCategoryId);
+        },
+        onTaskToggled: function(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            var completed = false, leftCheck, taskId, categoryId, $currentTarget, $row;
+
+            // Note: no 'active' class actually means it's about to "become active" ;)
+            $currentTarget = this.$(evt.currentTarget);
+            $row = $currentTarget.closest('tr');
+            $row.removeClass('completed');
+            if (!$currentTarget.hasClass('active')) {
+                completed = true;
+                $row.addClass('completed');
+            }
+            $row.find('button.mark-completed').button('toggle')
+            // Get task and category ids and toggle 'completed' property for task
+            leftCheck = $currentTarget.closest('tr').find('td:first input');
+            taskId = this.$(leftCheck).data('id');
+            categoryId = this.$(leftCheck).data('category-id');
+            this.collection.toggleTaskForCategory(categoryId, taskId, completed);
+            this.toggleClearCompleted();
+            // Hack: Sidebar listens for sync events and above essentially causes a 'sync'
+            // when categories are 'reset' .. this ensures we stay on same sidebar link
+            this.collection.trigger('select:category', this.lastCategoryId);
         },
         onRecordChecked: function(evt) {
             if (this.$('input[name=check]:checked').length === 0) {
@@ -206,6 +249,39 @@ function(
                 categoriesTitleElement = self.$(this).closest('div').find('.btn:first-child');
                 self.setCategoriesTitle(categoriesTitleElement, title, id);
             });
+        },
+        toggleClearCompleted: function() {
+            var completedTasks = this._getCompletedTasks(this.lastCategoryId);
+            if (completedTasks.length) {
+                this.$('.clear-completed').removeClass('disabled');
+            } else {
+                this.$('.clear-completed').addClass('disabled');
+            }
+        },
+        _getCompletedTasks: function(categoryId) {
+            var self = this, completed = [], category, completedTasks;
+            if (categoryId) {
+                category = _.find(this.collection.models, function(category) {return category.id === categoryId; });
+                completedTasks = this.collection.getCompletedForCategory(categoryId);
+            } else {
+                // We need to grab completed for 'All' tasks
+                this.collection.each(function(category) {
+                    // We need to find and flatten out all found completed task models
+                    var tasks = self.collection.getCompletedForCategory(category.id);
+                    var models = tasks ? tasks.models : [];
+                    completed.push(models);
+                });
+                completedTasks = new Tasks(_.flatten(completed));
+            }
+            return completedTasks;
+        },
+        filterByCompleted: function(categoryId) {
+            var self = this, completed = [], category, completedTasks;
+            var completedTasks = this._getCompletedTasks(categoryId);
+            this.tasks = completedTasks && completedTasks.length ? completedTasks.models : new Tasks();
+            this._addCategoryIDToTasks(category, this.tasks.models);
+            this.tableTitle = category ? category.get('title') : 'All';
+            this.render();
         },
         filterByCategories: function(categoryId) {
             var isCategory = this.setTasksForCategory(categoryId);

@@ -33,7 +33,6 @@ function(Backbone, _, sidebarTpl) {
         },
         updateSidebar: function(collection) {
             var collectionId = collection ? collection.id : null;
-            // Only re-render if we've already initialized view (seed data might trigger)
             if (this.$containerEl) {
                 this.render();
                 this.selectCategory(collectionId);

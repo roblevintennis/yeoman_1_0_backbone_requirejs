@@ -12,7 +12,7 @@ define([], function() {
      * @param {Backbone.Router} AppRouter   Application router
      */
     var App = function(Tasks, Categories, Task, Category, AppView, NavBarView, SidebarView, ContentView, AppRouter) {
-        // Our models will be instantiated later as needed later.
+        // Our models will be instantiated later as needed
         this.Models.Task = Task;
         this.Models.Category = Category;
         this.Collections.Tasks = Tasks;

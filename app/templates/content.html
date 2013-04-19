@@ -6,37 +6,52 @@
                     <a class="btn delete" href="#" disabled="disabled"><i class="icon-trash"></i></a>
                 </div>
             </div>
-            <table class="table table-hover tasks">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Title</th>
-                        <th>Categories</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (this.tasks && this.tasks.length) { %>
-                        <% for(var i=0; i<this.tasks.length; i++) { %>
+            <div id="table-wrap">
+                <table class="table table-hover tasks">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (this.tasks && this.tasks.length) { %>
+                            <% for(var i=0; i<this.tasks.length; i++) { %>
+                                <tr class="<%= this.tasks[i].get('completed') ? 'completed' : '' %>">
+                                    <td><input type="checkbox" name="check" data-category-id="<%= this.tasks[i].get('categoryId') %>" data-id="<%= this.tasks[i].get('id') %>"></td>
+                                    <td class="span4 title"><%= this.tasks[i].get('title') %></td>
+                                    <td class="span4 category">
+                                    <% var cat = this.tasks[i].get('category');
+                                        if (cat) { %>
+                                            <%= cat %>
+                                        <% } %>
+                                    </td>
+                                    <td><button type="button" class="mark-completed pull-right btn <%= this.tasks[i].get('completed') ? 'active' : '' %> "><i class="icon-ok"></i></button></td>
+                                </tr>
+                            <% } %>
+                        <% } else { %>
                             <tr>
-                                <td><input type="checkbox" name="check" data-category-id="<%= this.tasks[i].get('categoryId') %>" data-id="<%= this.tasks[i].get('id') %>"></td>
-                                <td class="span4"><%= this.tasks[i].get('title') %></td>
-                                <td class="span4">
-                                <% var categories = this.tasks[i].get('categories');
-                                    if (categories) {
-                                    for(var j=0; j<categories.length; j++) { %>
-                                        <%= this.tasks[i].get('categories')[j] + (j<categories.length-1 ? ',' : '') %>
-                                    <% }
-                                } %>
-                                </td>
+                                <td></td>
+                                <td>No tasks found.</td>
+                                <td></td>
+                                <td></to>
                             </tr>
                         <% } %>
-                    <% } else { %>
-                        <tr>
-                            <td></td>
-                            <td>No tasks found.</td>
-                            <td></td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
+            <div class="filters row-fluid">
+                <span id="items-left" class="span4"><%= this.tasks.length %> item<%= this.tasks.length == 0 || this.tasks.length > 1 ? 's' : '' %></span>
+                <ul class="span4 inline">
+                    <li>
+                        <a href="javascript:void(0)" class="filter-all">All</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="filter-completed">Completed</a>
+                    </li>
+                </ul>
+                <button type="button" class="btn btn-success pull-right clear-completed disabled">Clear completed</button>
+            </div>
         </div>
