@@ -8,7 +8,6 @@ function(Backbone, Store) {
             title: '',
             completed: false
         }
-        // url: '/tasks'
     });
     return Task;
 });

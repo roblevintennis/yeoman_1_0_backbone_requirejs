@@ -8,22 +8,15 @@ define([
     'text!templates/categories-dropdown-partial.html',
     'text!templates/delete-confirm-partial.html'
 ],
-function(
-    Backbone,
-    _,
-    Tasks,
-    Task,
-    contentTpl,
-    createTaskTpl,
-    categoriesDropdownTpl,
-    deleteConfirmPartial
-){
+function(Backbone, _, Tasks, Task, contentTpl, createTaskTpl, categoriesDropdownTpl, deleteConfirmPartial)
+{
     var ContentView = Backbone.View.extend({
         template: _.template(contentTpl),
         createTemplate: _.template(createTaskTpl),
         categoriesDropdownTemplate: _.template(categoriesDropdownTpl),
         deleteConfirmTemplate: _.template(deleteConfirmPartial),
         tasks: [],
+        enableAddCategory: true,
         className: "content",
         events: {
             'click input[name=check]': 'onRecordChecked',
@@ -32,18 +25,17 @@ function(
             'click .filter-completed': 'onFilterCompleted',
             'click .filter-all': 'onFilterAll',
             'click .btn.create': 'onCreateTask',
+            'dblclick .title': 'onEditTitle',
+            'dblclick td.category': 'onEditCategory',
+            'blur .title-editing': 'onFinishedEditingTitle',
+            'click .category-editing li': 'onFinishedEditingCategory',
             'click .btn.delete': 'onDeleteTasks',
             'click .save-cancel a.cancel': 'onCancel',
             'click .save-cancel button.save': 'onSaveTask',
             'click #newCategoryModal .btn.save': 'onSaveNewCategory',
-            'keypress .task-title': 'onKeypress'
+            'keypress .task-title': 'onKeypress',
+            'keypress .title-editing': 'onEditingTitleKeypress'
         },
-        /**
-         * Renders the content view
-         * @param  {Object} $el A jQuery object pointing to the this view's
-         * container. This should only be passed on bootstrap.
-         * @return {Backbone.View} This view.
-         */
         render: function($el) {
             this.$containerEl = $el || this.$containerEl;
             this.tableTitle = this.tableTitle || 'All';
@@ -58,6 +50,63 @@ function(
             this.listenTo(this.collection, 'categories:selected:changed', this.filterByCategories);
             this.listenTo(this.collection, 'category:delete', this.confirmDelete);
             this.listenTo(this.collection, 'destroy', this.onCategoryDeleted);
+        },
+        onFinishedEditingTitle: function(evt) {
+            evt.preventDefault();
+            var $row, $col, $inp, oldtitle, newtitle, $leftCheck, taskId, categoryId, $currentTarget;
+            $currentTarget = this.$(evt.currentTarget);
+            $col = this.$($currentTarget);
+            $row = this.$($currentTarget).closest('tr');
+            leftCheck = $currentTarget.closest('tr').find('td:first input');
+            taskId = this.$(leftCheck).data('id');
+            categoryId = this.$(leftCheck).data('category-id');
+            $inp = this.$($col).find('input');
+            oldtitle = $inp.data('old-title');
+            newtitle = $inp.val();
+            // Hack - if called as a result of <enter>, that inp.remove will, in turn, cause this to fire again and then we get a DOM not found exception
+            try {$inp.remove();} catch(e){}
+            this.$($col).removeClass('title-editing').addClass('title').text(newtitle);
+            if (oldtitle && oldtitle !== newtitle) {
+                this.collection.setTaskForCategory(categoryId, taskId, {title: newtitle});
+            }
+        },
+        onEditTitle: function(evt) {
+            evt.preventDefault();
+            var col = this.$(evt.currentTarget);
+            var taskTitle = this.$(col).removeClass('title').addClass('title-editing').text() || '';
+            this.$(col).text('');
+            $('<input type="text" class="edit-title" data-old-title="'+taskTitle+'" value="' + taskTitle + '" />').fadeIn('slow').appendTo(col);
+        },
+        onFinishedEditingCategory: function(evt) {
+            evt.preventDefault();
+            var $anchor, $currentTarget, $row, leftCheck, taskId, categoryId, previousCategoryId, newtitle;
+            $currentTarget = this.$(evt.currentTarget);
+            $row = this.$($currentTarget).closest('tr');
+            leftCheck = $currentTarget.closest('tr').find('td:first input');
+            taskId = this.$(leftCheck).data('id');
+            previousCategoryId = this.$(leftCheck).data('category-id');
+            $anchor = this.$(evt.currentTarget).find('a');
+            newtitle = $anchor.text();
+            if ($anchor) {
+                categoryId = $anchor.data('id');
+                if (previousCategoryId && previousCategoryId !== categoryId) {
+                    // We need to change the category id in the checkbox attribute too
+                    this.$(leftCheck).data('category-id', categoryId);
+                    this.collection.moveTaskToCategory(previousCategoryId, categoryId, taskId);
+                }
+            }
+            $('.dropdown-toggle').dropdown('toggle');
+            this.$($currentTarget).closest('td').removeClass('category-editing').addClass('category').text(newtitle);
+            this.reloadCategories(categoryId);
+        },
+        onEditCategory: function(evt) {
+            evt.preventDefault();
+            var col, categoryTitle, dropdownToggle, dropdown, categoriesTitleElement, categoryId;
+            col = this.$(evt.currentTarget);
+            categoryTitle = this.$(col).removeClass('category').addClass('category-editing').text() || '';
+            categoryTitle = categoryTitle ? categoryTitle.trim() : '';
+            this.$(col).text('');
+            this.renderCategoriesDropdownNoAdd(col, categoryTitle);
         },
         // When user clicks pencil to add a new task
         onCreateTask: function(evt) {
@@ -86,6 +135,11 @@ function(
         onKeypress: function(evt) {
             if (evt.which === 13) {
                 this.onSaveTask(evt);
+            }
+        },
+        onEditingTitleKeypress: function(evt) {
+            if (evt.which === 13) {
+                this.onFinishedEditingTitle(evt);
             }
         },
         // When user clicks trash icon to with one or more tasks checked
@@ -209,7 +263,7 @@ function(
                 addedCategory = this.collection.at(this.collection.length-1);
                 enteredTaskTitle = this.$('table.create-task .task-title').val();
                 this.enteredTitle = enteredTaskTitle || '';
-                this.renderDropdown();
+                this.renderCategoriesDropdown();
                 categoriesTitleElement = this.$('table.create-task').find('.btn.menu:first-child')
                 this.setCategoriesTitle(categoriesTitleElement, addedCategory.get('title'), addedCategory.id);
                 this.$('#newCategoryModal').modal('hide');
@@ -222,17 +276,48 @@ function(
             // Here we're inserting create task just above the main tasks table.
             this.$('table.tasks').before(createTaskTpl);
             // Disable the pencil if we're already in create mode
-            this.renderDropdown();
+            this.renderCategoriesDropdown();
             this.$('.btn.create').attr('disabled', 'disabled');
         },
-        renderDropdown: function() {
-            // Remove previous listener before removing dropdown
-            this.$(".dropdown-menu li a").off('click');
-            this.$('.categories.dropdown-menu').remove();
-            // Create new dropdown
-            var dropdown = this.categoriesDropdownTemplate();
+        renderCategoriesDropdownNoAdd: function(col, categoryTitle) {
+            var dropdownToggle, dropdown, categoriesTitleElement, categoryId;
+            this._disposeCategoriesDropdownListeners(col);
+            dropdownToggle = '<div class="btn-group"><button class="btn menu">Select a category</button> <button class="btn dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span></button>'
+            dropdown = this._compileCategoriesDropdown(false);//no add category
+            col.append(dropdownToggle + dropdown + '</div>');
+            this.bindCategoryTitle();
+            this._presetCategoriesDropdownTitle(col, categoryTitle);
+        },
+        renderCategoriesDropdown: function() {
+            this._disposeCategoriesDropdownListeners('table.create-task');
+            var dropdown = this._compileCategoriesDropdown(true);
             this.$('table.create-task button.dropdown-toggle').after(dropdown);
             this.bindCategoryTitle();
+        },
+        _presetCategoriesDropdownTitle: function(col, categoryTitle) {
+            var categoryId, categoriesTitleElement;
+            this.$(col.find('ul.categories li')).each(function(i, li) {
+                if ($(li).text() === categoryTitle) {
+                    categoryId = $(li).find('a').data('id')
+                }
+            });
+            categoriesTitleElement = this.$(col).find('.btn.menu:first-child')
+            if (categoriesTitleElement && categoryId) {
+                this.setCategoriesTitle(categoriesTitleElement, categoryTitle, categoryId);
+            }
+        },
+        // sel is a selector pointed at a root element to limit the scope searched
+        // so we don't inadvertantly turn off other dropdowns on the page ;)
+        _disposeCategoriesDropdownListeners: function(sel) {
+            // Remove previous listener before removing dropdown
+            this.$(sel).find(".dropdown-menu li a").off('click');
+            this.$(sel).find('.categories.dropdown-menu').remove();
+        },
+        _compileCategoriesDropdown: function(enableAddCategory) {
+            this.enableAddCategory = enableAddCategory !== undefined ? enableAddCategory : true;
+            var dropdown = this.categoriesDropdownTemplate();
+            this.enableAddCategory = true;//always go back to add category enabled
+            return dropdown;
         },
         setCategoriesTitle: function(categoriesTitleElement, title, id) {
             categoriesTitleElement.text(title);

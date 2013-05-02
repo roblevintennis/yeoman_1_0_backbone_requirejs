@@ -18,12 +18,6 @@ function(Backbone, _, sidebarTpl) {
             // Sync fired when they add a new category via 'Create category'
             this.listenTo(this.collection, 'sync', this.updateSidebar);
         },
-        /**
-         * Renders the content view
-         * @param  {Object} $el A jQuery object pointing to the this view's
-         * container.
-         * @return {Backbone.View} This view.
-         */
         render: function($el) {
             this.$containerEl = $el || this.$containerEl;
             var rendered = this.$el.html(this.template());
@@ -84,7 +78,6 @@ function(Backbone, _, sidebarTpl) {
                 }
             }
         }
-
     });
     return SidebarView;
 });

@@ -16,131 +16,117 @@
 }
 body {
     background-image: url('../images/cloth_alike.png');
+    padding-top: 85px;
 }
-#app {
-    #table-wrap {
-        min-height: 400px;
-    }
-    // Override to put our custom muted gray background
-    textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input,
-    .well, .custom-well, #newCategoryModal {
-        background-color: #f8f8f8;
-    }
-    margin-top: 85px;
-    .cat-create {
-        margin-bottom: 20px;
-    }
-    h4.table-title {
-        padding-right: 8px;
-        color: #005580;
-    }
-    table.tasks {
-        tr {
-            background-color: inherit;
-            td.title, td.category {
-                text-decoration: none;
-                color: #333333;
-            }
+#table-wrap {
+    min-height: 400px;
+}
+.well.sidebar-nav {
+    min-width: 75px;
+}
+// Override to put our custom muted gray background
+textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input,
+.well, .custom-well, #newCategoryModal {
+    background-color: #f8f8f8;
+}
+.cat-create {
+    margin-bottom: 20px;
+}
+h4.table-title {
+    padding-right: 8px;
+    color: #005580;
+}
+table.tasks {
+    tr {
+        background-color: inherit;
+        td.title, td.category {
+            text-decoration: none;
+            color: #333333;
         }
-        tr.completed {
-            background-color: #efefef;
-            td.title {
-                text-decoration: line-through;
-                color: #aaa;
-            }
-            td.category {
-                color: #aaa;
-            }
-            .btn.active, .btn:active {
-                background-color: #40be80;
-                -webkit-box-shadow: inset 0px -1px 1px rgba(0, 0, 0, 0.45), 0px 1px 1px rgba(0, 0, 0, 0.25);
-                -moz-box-shadow: inset 0px -1px 1px rgba(0, 0, 0, 0.45), 0px 1px 1px rgba(0, 0, 0, 0.25);
-                -ms-box-shadow: inset 0px -1px 1px rgba(0, 0, 0, 0.45), 0px 1px 1px rgba(0, 0, 0, 0.25);
-                -o-box-shadow: inset 0px -3px 1px rgba(0, 0, 0, 0.45), 0px 2px 2px rgba(0, 0, 0, 0.25);;
-                // If we add icon-white class in js there's a lag between background turning
-                // green .. so it's better to manually do this here in the css
-                .icon-ok {
-                    background-image: url("../img/glyphicons-halflings-white.png");
-                }
+    }
+    tr.completed {
+        background-color: #efefef;
+        td.title {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+        td.category {
+            color: #aaa;
+        }
+        .btn.active, .btn:active {
+            background-color: #40be80;
+            @include box-shadow(inset 0 -1px 1px rgba(0, 0, 0, 0.45), 0 1px 1px rgba(0, 0, 0, 0.25));
+            // If we add icon-white class in js there's a lag between background turning
+            // green .. so it's better to manually do this here in the css
+            .icon-ok {
+                background-image: url("../img/glyphicons-halflings-white.png");
             }
         }
     }
-    .sidebar-nav,
-    .custom-well {
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        -ms-border-radius: 4px;
-        -o-border-radius: 4px;
-        border-radius: 4px;
-        -webit-box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.1), 0 5px 10px 0 rgba(0, 0, 0, 0.1);
-        -moz-box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.1), 0 5px 10px 0 rgba(0, 0, 0, 0.1);
-        -ms-box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.1), 0 5px 10px 0 rgba(0, 0, 0, 0.1);
-        -o-box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.1), 0 5px 10px 0 rgba(0, 0, 0, 0.1);
-        box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.1), 0 5px 10px 0 rgba(0, 0, 0, 0.1);
+}
+.sidebar-nav,
+.custom-well {
+    @include border-radius($baseBorderRadius);
+    @include box-shadow(0 2px 30px 0 rgba(0, 0, 0, 0.1), 0 5px 10px 0 rgba(0, 0, 0, 0.1));
+}
+.custom-well {
+    position: relative;
+    margin: 0px;
+    padding: 15px 20px 5px;
+    border: 1px solid #ddd;
+}
+// When resizing window ensures that the table/content view is within the well's area
+.content>.custom-well {
+    min-width: 300px;
+}
+.btn-group .menu {
+    min-width: 175px;
+}
+td.save-cancel {
+    min-width: 90px;
+}
+a.cancel {
+    margin-left: 5px;
+    font-size: 14px;
+}
+table.create-task {
+    margin-bottom: 0px;
+}
+.nav-list li {
+    position: relative;
+    min-width: 55px;
+}
+.nav-list > .active > a,
+.nav-list > .active > a:hover,
+.nav-list > .active > a:focus,
+a.category {
+    @include border-radius(3px);
+}
+a.category:hover i.remove-category {
+    display:block;
+    text-shadow: 5px 5px 7px rgba(150, 150, 150, 0.4);
+}
+i.remove-category {
+    display: none;
+    position: absolute;
+    right: -12px;
+    top: 5px;
+}
+i.remove-category:hover {
+    display: block;
+    @include scale(1.2);
+}
+div.filters {
+    font-size: 14px;
+    margin-top: 20px;
+    span {
+        padding-top: 6px;
     }
-    .custom-well {
-        position: relative;
-        margin: 0px;
-        padding: 15px 20px 5px;
-        border: 1px solid #ddd;
-    }
-    .btn-group .menu {
-        min-width: 175px;
-    }
-    td.save-cancel {
-        min-width: 90px;
-    }
-    a.cancel {
-        margin-left: 5px;
-        font-size: 14px;
-    }
-    table.create-task {
-        margin-bottom: 0px;
-    }
-    .nav-list li {
-        position: relative;
-        min-width: 75px;
-    }
-    .nav-list > .active > a,
-    .nav-list > .active > a:hover,
-    .nav-list > .active > a:focus,
-    a.category {
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        -ms-border-radius: 3px;
-        -o-border-radius: 3px;
-        border-radius: 3px;
-    }
-    a.category:hover i.remove-category {
-        display:block;
-        text-shadow: 5px 5px 7px rgba(150, 150, 150, 0.4);
-    }
-    i.remove-category {
-        display: none;
-        position: absolute;
-        right: -12px;
-        top: 5px;
-    }
-    i.remove-category:hover {
-        display: block;
-        -webkit-transform: scale(1.2);
-        -moz-transform: scale(1.2);
-        -ms-transform: scale(1.2);
-        -o-transform: scale(1.2);
-        transform: scale(1.2);
-    }
-    div.filters {
-        font-size: 14px;
-        margin-top: 20px;
-        span {
-            padding-top: 6px;
-        }
-        ul {
-            padding-top: 6px;
-            margin-left: 40px;
-            li {
-                padding-left: 0px;
-            }
+    ul {
+        padding-top: 6px;
+        margin-left: 40px;
+        li {
+            padding-left: 0px;
         }
     }
 }

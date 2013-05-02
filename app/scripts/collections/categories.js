@@ -17,7 +17,7 @@ function(Backbone, Tasks, Task, Category, Store) {
          * @param  {Function} completedFunc Callback function to perform on updated categories (if category etc. found)
          */
         _performAction: function(categoryId, taskId, actionFunc, completedFunc) {
-            var actionPerformed = false;
+            var actionPerformed = false, self = this;
             // If categoryId is falsy we will perform action on all categories
             var performActionOnAllCategories = categoryId ? false : true;
             var updateCategories = _.map(this.models, function(category) {
@@ -28,10 +28,10 @@ function(Backbone, Tasks, Task, Category, Store) {
                     if (taskId) {
                         task = tasks.get(taskId);
                         if (task) {
-                            actionFunc(tasks, task, category);
+                            actionFunc.call(self, tasks, task, category);
                         }
                     } else {
-                        actionFunc(tasks, category);
+                        actionFunc.call(self, tasks, category);
                     }
                     // We've matched on category id so always mark actionPerformed true at this point
                     actionPerformed = true;
@@ -39,7 +39,12 @@ function(Backbone, Tasks, Task, Category, Store) {
                 return category;
             });
             if (completedFunc) {
-                completedFunc(actionPerformed ? updateCategories : false);
+                completedFunc.call(self, actionPerformed ? updateCategories : false);
+            }
+        },
+        _updateCategories: function(updateCategories) {
+            if (updateCategories) {
+                this.reset(updateCategories);
             }
         },
         getCompletedForCategory: function(categoryId) {
@@ -62,11 +67,31 @@ function(Backbone, Tasks, Task, Category, Store) {
                     tasks.create(taskAttributes);
                     category.save({tasks: tasks});
                 },
-                function(updateCategories) {
-                    if (updateCategories) {
-                        self.reset(updateCategories);
-                    }
-                });
+                self._updateCategories);
+        },
+        moveTaskToCategory: function(categoryId, moveToCategoryId, taskId) {
+            var self = this;
+            this._performAction(categoryId, taskId,
+                function(tasks, task, originalCategory) {
+                    var moveToCategory, moveToTasks;
+                    tasks.remove(task);
+                    originalCategory.save({tasks: tasks}, {silent: true});
+                    moveToCategory = this.get(moveToCategoryId);
+                    moveToTasks = moveToCategory.get('tasks') || new Tasks();
+                    task.set({category: moveToCategory.get('title'), categoryId: moveToCategory.id})
+                    moveToTasks.push(task);
+                    moveToCategory.save({tasks: moveToTasks}, {silent: true});
+                },
+                self._updateCategories);
+        },
+        setTaskForCategory: function(categoryId, taskId, attributes) {
+            var self = this;
+            this._performAction(categoryId, taskId,
+                function(tasks, task, category) {
+                    task.set(attributes);
+                    category.save({tasks: tasks}, {silent: true});
+                },
+                self._updateCategories);
         },
         pruneCompletedForCategory: function(categoryId) {
             var self = this;
@@ -81,11 +106,7 @@ function(Backbone, Tasks, Task, Category, Store) {
                     }
                     category.save({tasks: tasks});
                 },
-                function(updateCategories) {
-                    if (updateCategories) {
-                        self.reset(updateCategories);
-                    }
-                });
+                self._updateCategories);
         },
         toggleTaskForCategory: function(categoryId, taskId, checked) {
             var self = this;
@@ -95,11 +116,7 @@ function(Backbone, Tasks, Task, Category, Store) {
                     // silent because we don't want category save to update active sidebar link
                     category.save({tasks: tasks}, {silent: true});
                 },
-                function(updateCategories) {
-                    if (updateCategories) {
-                        self.reset(updateCategories);
-                    }
-                });
+                self._updateCategories);
         },
         removeTaskForCategory: function(categoryId, taskId) {
             var removed = false, self = this;
@@ -109,11 +126,7 @@ function(Backbone, Tasks, Task, Category, Store) {
                     category.save({tasks: tasks});
                     removed = true;
                 },
-                function(updateCategories) {
-                    if (updateCategories) {
-                        self.reset(updateCategories);
-                    }
-                });
+                self._updateCategories);
         }
     });
     return Categories;
