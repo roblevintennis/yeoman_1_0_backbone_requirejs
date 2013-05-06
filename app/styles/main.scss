@@ -1,4 +1,12 @@
 @import 'sass-bootstrap/lib/bootstrap';
+// This has to go above the responsive import since the padding-top
+// will get unset to 0 for smaller screens like tablets, etc.
+// See sass-bootstrap/lib/_responsive-navbar.scss
+body {
+    background-image: url('../images/cloth_alike.png');
+    padding-top: 90px;
+}
+@import 'sass-bootstrap/lib/responsive';
 .navbar {
     .brand {
         font-family: 'Satisfy', cursive;
@@ -13,10 +21,6 @@
     .navbar-inner {
         min-height: 70px;
     }
-}
-body {
-    background-image: url('../images/cloth_alike.png');
-    padding-top: 85px;
 }
 #table-wrap {
     min-height: 400px;
