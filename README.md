@@ -1,6 +1,3 @@
-yeoman_1_0_backbone_requirejs
-=============================
-
 # [A Yeoman 1.0 Backbone RequireJS Example] (http://www.youtube.com/watch?v=QYzjfT78Ir8)
 
 This is an example application for using these libs meant to accompany the: [How To Code - Backbone RequireJS Yeoman Vids][vids]
@@ -17,7 +14,6 @@ alt="How to code - Backbone RequireJS Yeoman Videos on Youtube" width="240" heig
 
 **DISCLAIMER: I did this in my spare time for example purposes; there are some "anti-patterns" you should avoid in a real project e.g. Category model code that uses backbone localstorage is not a recommended approach and is not __efficient__.**
 
-## Deps
 Make sure you have Node.js, Git, Ruby and Compass installed. Oh and an internet connection...duh!
 
 ```base
@@ -38,8 +34,10 @@ grunt && grunt server
 # Contributing
 
 Just because this is an instructional repo doesn't mean it can't be improved. If you see something glaringly wrong, please feel free tosubmit a PR. I'm open if it's a legitimate improvement.
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
